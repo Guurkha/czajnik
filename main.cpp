@@ -26,6 +26,7 @@ void ReshapeWindow(int width, int height);
 
 /* K¹t obrotu czajnika */
 GLfloat theta = 0.0f;
+GLfloat theta2 = 0.0f;
 /* Przelicznik pixeli na k¹t */
 GLfloat pixels2angle = 0.0;
 /* Status lewego przycisku myszy:
@@ -36,6 +37,12 @@ GLint lbutton_status = 0;
 GLint x_last_pos = 0;
 /* Przemieszczenie kursora */
 GLint x_delta = 0;
+
+GLint rbutton_status = 0;
+/* Ostatnia pozycja kursora myszy */
+GLint y_last_pos = 0;
+/* Przemieszczenie kursora */
+GLint y_delta = 0;
 
 
 
@@ -54,9 +61,15 @@ void MouseFunc(int button, int state, int x, int y)
 	x_last_pos = x;
 	// Przycisk lewy wcisniêty
 	lbutton_status = 1;
-	} else {
+	} else if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) 
+	{
+	y_last_pos = x;
+	rbutton_status = 1;
 	// Przycisk jest zwolniony
+	}
+	else{
 	lbutton_status = 0;
+	rbutton_status = 0;
 	}
 }
 
@@ -67,9 +80,15 @@ void MouseFunc(int button, int state, int x, int y)
 	x_delta = x - x_last_pos;
 	// Zapamiêtujemy aktualne po³o¿enie
 	x_last_pos = x;
+	
+	y_delta = y - y_last_pos;
+	// Zapamiêtujemy aktualne po³o¿enie
+	y_last_pos = y;
 	// Odœwie¿amy okno
 	glutPostRedisplay();
 	}
+	/* Funkcja obs³uguj¹ca mysz - bada stan klawiszy i ustawia odpowiednie zmienne */
+
 
 /* Funkcja main */
 int main(int argc, char **argv)
@@ -89,6 +108,8 @@ int main(int argc, char **argv)
 	glutMouseFunc(MouseFunc);
 	// Rejestracja funkcji odpowiedzialnej za ruch myszy
 	glutMotionFunc(MouseMotion);
+	
+
 
 	// Sprawdzamy powodzenie operacji
 	if(mainWindow == 0){
@@ -183,6 +204,15 @@ void DrawSceneAxes(void)
 	}
 	// Obrót w okó³ osi y
 	glRotatef(theta,0.0f, 1.0f, 0.0f);
+	
+	// Jeœli wciœniêto lewy klawisz myszy
+if(rbutton_status == 1)
+{
+// Zwiêksz k¹t
+theta2 += y_delta*pixels2angle;
+}
+// Obrót w okó³ osi y
+glRotatef(theta2,1.0f, 0.0f, 0.0f);
 	glColor3f(0.5f, 0.5f, 0.5f);
 	glutWireTeapot(4.0);
 }
@@ -240,5 +270,3 @@ void ReshapeWindow(int width, int height)
     glLoadIdentity();
 	
 }
-
-
